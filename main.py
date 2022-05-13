@@ -77,7 +77,7 @@ def db_engine(db_host:str, db_user:str, db_pass:str, db_name:str="spotify") -> s
         sa.engine.Engine: sqlalchemy engine
     """
     #create enginge
-    engine = create_engine(f'mysql+pymsql://{db_user}:{db_pass}@{db_host}/{db_name}', future = True)
+    engine = create_engine(f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}', future = True)
     metadata = MetaData(bind=engine)
     conn = engine.connect()
     return engine
