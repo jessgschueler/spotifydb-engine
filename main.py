@@ -44,6 +44,7 @@ class DataLoader():
         Args:
             column_name (str): column name to sort by
         """
+        return self.df.sort_values(column_name, axis = 0, ascending = True, inplace = False)
 
     def load_to_db(self, db_engine, db_table_name:str) -> None:
         """
