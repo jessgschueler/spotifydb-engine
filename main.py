@@ -70,6 +70,7 @@ def db_engine(db_host:str, db_user:str, db_pass:str, db_name:str="spotify") -> s
     Returns:
         sa.engine.Engine: sqlalchemy engine
     """
+    #create enginge
     engine = create_engine(f'mysql+pymsql://{db_user}:{db_pass}@{db_host}/{db_name}', future = True)
     return engine
 
@@ -85,8 +86,38 @@ def db_create_tables(db_engine, drop_first:bool = False) -> None:
     """
     meta = sa.MetaData(bind=db_engine)
 
-    # your code to define tables go in here
-    #   - Be careful, some of the columns like album.available_markets are very long. Make sure you give enough DB length for these. ie: 10240 (10kb)
+    #define tables
+    artists_table = Table("artists",
+        metadata,
+        Column('artist_poularity', Numeric),
+        Column('followers', Numeric),
+        Column('genres', String(10240)),
+        Column('id', Numeric, primary_key=True),
+        Column('name', String(256)),
+        Column('track_id', String(256)),
+        Column('track_name_prev', String(256)),
+        Column('type', String(256)),
+        extend_existing=True
+    )
+
+    albums_table = Table("albums",
+        metadata,
+        Column('album_type', String(256)),
+        Column('artist_id', String(256)),
+        Column('available_markets', String(10240)),
+        Column('external_urls', String(256)),
+        Column('href', String(256)),
+        Column('id', String(256), primary_key=True),
+        Column('name', String(10240)),
+        Column('release_date', DateTime, nullable=True),
+        Column('release_date_precision', String(256)),
+        Column('total_tracks', Numeric),
+        Column('track_id', String(256)),
+        Column('track_name_prev', String(256)),
+        Column('uri', String(256)),
+        Column('type', String(256)),
+        extend_existing=True
+    )
 
     # your code to drop and create tables go here
 
