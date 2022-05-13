@@ -1,5 +1,8 @@
 import pandas as pd
 import sqlalchemy as sa
+from sqlalchemy import create_engine, text
+from sqlalchemy import MetaData
+from sqlalchemy.sql import text
 
 
 class DataLoader():
@@ -32,7 +35,7 @@ class DataLoader():
             index_name (str): the index column name
             colum_names (list): list of columns to concatenate into an index column
         """
-        df = self.head
+        df = self.df
         df[index_name] = df[column_names].apply(lambda row: "-".join(row.values.astype(str)), axis=1)
         df.set_index(index_name, inplace= True)
         self.df = df
@@ -75,6 +78,8 @@ def db_engine(db_host:str, db_user:str, db_pass:str, db_name:str="spotify") -> s
     """
     #create enginge
     engine = create_engine(f'mysql+pymsql://{db_user}:{db_pass}@{db_host}/{db_name}', future = True)
+    metadata = MetaData(bind=engine)
+    conn = engine.connect()
     return engine
 
 def db_create_tables(db_engine, drop_first:bool = False) -> None:
@@ -146,13 +151,13 @@ def main():
     - creates database metadata tables/columns
     - loads both artists and albums into database
     """
-    artist_loader = DataLoader('./data/artists.csv', index = 'id')
-    album_loader = DataLoader('./data/albums.csv')
+    artist_loader = DataLoader('./data/spotify_artists.csv', index = 'id')
+    album_loader = DataLoader('./data/spotify_albums.csv')
     artist_loader.head()
     album_loader.head()
-    album_loader.add_index('index', ['artist_isd','name', 'release_date'])
+    album_loader.add_index('index', ['artist_id','name','release_date'])
     artist_loader.sort('name')
-    engine = db_engine('127.0.0.1:3306', 'loader', 'mysql')
+    engine = db_engine('127.0.0.1:3306', 'root', 'mysql')
     db_create_tables(engine, drop_first = True)
     artist_loader.load_to_db(engine, 'artists')
     album_loader.load_to_db(engine, 'albums')
