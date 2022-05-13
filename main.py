@@ -21,7 +21,7 @@ class DataLoader():
         """
         return self.df.head()
 
-    def add_index(self, index_name:str, colum_names:list) -> None:
+    def add_index(self, index_name:str, column_names:list) -> None:
         """
         Create a dataframe index column from concatenating a series of column values. Column values are concatenated by a dash "-".
 
@@ -32,7 +32,10 @@ class DataLoader():
             index_name (str): the index column name
             colum_names (list): list of columns to concatenate into an index column
         """
-        
+        df = self.head
+        df[index_name] = df[column_names].apply(lambda row: "-".join(row.values.astype(str)), axis=1)
+        df.set_index(index_name, inplace= True)
+        self.df = df
 
     def sort(self, column_name:str) -> None:
         """
