@@ -57,6 +57,7 @@ class DataLoader():
 
 
 
+
 def db_engine(db_host:str, db_user:str, db_pass:str, db_name:str="spotify") -> sa.engine.Engine:
     """Using SqlAlchemy, create a database engine and return it
 
@@ -69,8 +70,8 @@ def db_engine(db_host:str, db_user:str, db_pass:str, db_name:str="spotify") -> s
     Returns:
         sa.engine.Engine: sqlalchemy engine
     """
-    pass
-
+    engine = create_engine(f'mysql+pymsql://{db_user}:{db_pass}@{db_host}/{db_name}', future = True)
+    return engine
 
 def db_create_tables(db_engine, drop_first:bool = False) -> None:
     """
