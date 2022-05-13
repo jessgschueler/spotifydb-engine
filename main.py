@@ -119,7 +119,12 @@ def db_create_tables(db_engine, drop_first:bool = False) -> None:
         extend_existing=True
     )
 
-    # your code to drop and create tables go here
+    #drop tables is drop_first = True
+    if drop_first:
+        metadata.drop_all()
+    
+    #create tables
+    metadata.create_all(checkfirst=True)
 
 
 def main():
