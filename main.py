@@ -54,6 +54,9 @@ class DataLoader():
             db_engine (SqlAlchemy Engine): SqlAlchemy engine (or connection) to use to insert into database
             db_table_name (str): name of database table to insert to
         """
+        #
+        self.df.to_sql(name=db_table_name, con=self.engine, if_exists='append', chunksize=2000)
+
 
 
 
@@ -89,6 +92,7 @@ def db_create_tables(db_engine, drop_first:bool = False) -> None:
     #define tables
     artists_table = Table("artists",
         metadata,
+        Column('index', Numeric),
         Column('artist_poularity', Numeric),
         Column('followers', Numeric),
         Column('genres', String(10240)),
@@ -102,6 +106,7 @@ def db_create_tables(db_engine, drop_first:bool = False) -> None:
 
     albums_table = Table("albums",
         metadata,
+        Column('index', Numeric),
         Column('album_type', String(256)),
         Column('artist_id', String(256)),
         Column('available_markets', String(10240)),
@@ -141,8 +146,17 @@ def main():
     - creates database metadata tables/columns
     - loads both artists and albums into database
     """
-    pass
-
+    artist_loader = DataLoader('./data/artists.csv', index = 'id')
+    album_loader = DataLoader('./data/albums.csv')
+    artist_loader.head()
+    album_loader.head()
+    album_loader.add_index('index', ['artist_isd','name', 'release_date'])
+    artist_loader.sort('name')
+    engine = db_engine('127.0.0.1:3306', 'loader', 'mysql')
+    db_create_tables(engine, drop_first = True)
+    artist_loader.load_to_db(engine, 'artists')
+    album_loader.load_to_db(engine, 'albums')
+    
 
 if __name__ == '__main__':
     main()
